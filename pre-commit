@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# .git/hooks/pre-commit
+# Enforce that the committer email ends with @company.com
+# Portable POSIX shell version — works with /bin/sh
+
+# Get email from git config, fallback to GIT_AUTHOR_EMAIL
+email="$(git config user.email || true)"
+if [ -z "$email" ]; then
+  email="${GIT_AUTHOR_EMAIL:-}"
+fi
+
+case "$email" in
+  *@company.com)
+    printf 'Your email (%s) satisfies Git policy.\n' "$email"
+    exit 0
+    ;;
+  *)
+    printf 'Error: your email (%s) does not satisfy Git policy; it must end with @company.com.\n' "$email"
+    printf 'Set it with: git config user.email "you@company.com"\n'
+    exit 1
+    ;;
+esac
